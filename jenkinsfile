@@ -1,0 +1,42 @@
+pipeline {
+    agent any
+    environment {
+        DOCKER_HUB_CREDENTIALS = credentials('dockerhub-credentials')  // Credentials ID
+        DOCKER_IMAGE = "ananyacshekar/jenkins-react"
+    }
+    stages {
+        stage('Checkout') {
+            steps {
+                git branch: 'main', url: 'https://github.com/ananyacshekar/jenkins-react.git'
+            }
+        }
+        stage('Build') {
+            steps {
+                script {
+                    // Build Docker image
+                    docker.build(DOCKER_IMAGE)
+                }
+            }
+        }
+        stage('Push to Docker Hub') {
+            steps {
+                script {
+                    // Authenticate with Docker Hub using credentials
+                    docker.withRegistry('https://index.docker.io/v1/', 'DOCKER_HUB_CREDENTIALS') {
+                        // Push Docker image to Docker Hub
+                        docker.image(DOCKER_IMAGE).push("latest")
+                    }
+                }
+            }
+        }
+        stage('Deploy to Kubernetes') {
+            steps {
+                script {
+                    // Apply Kubernetes deployment and service configurations
+                    sh "kubectl apply -f k8s-deployment.yaml"
+                    sh "kubectl apply -f k8s-service.yaml"
+                }
+            }
+        }
+    }
+} 
