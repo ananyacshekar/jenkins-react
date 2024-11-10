@@ -1,0 +1,41 @@
+name: Node.js CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    # Step 1: Checkout the code
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    # Step 2: Set up Node.js
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '16'
+
+    # Step 3: Install dependencies
+    - name: Install dependencies
+      run: npm install
+
+    # Step 4: Run tests (optional, can be skipped if no tests)
+    - name: Run tests
+      run: npm test
+
+    # Step 5: Build the app (if applicable, usually for front-end apps)
+    - name: Build the app
+      run: npm run build
+
+    # Step 6: Deploy (if applicable, you can add your deployment scripts here)
+    - name: Deploy to production (example)
+      run: |
+        echo "Deploying to production..."
